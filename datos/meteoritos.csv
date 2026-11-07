@@ -19999,4 +19999,4 @@ id,name,recclass,mass (g),fall,year,reclat,reclong
 13022,Lewis Cliff 86083,H5,198.9,Found,1986,-84.278890,161.610960
 13023,Lewis Cliff 86084,L6,53.1,Found,1986,-84.273730,161.690900
 13024,Lewis Cliff 86085,H6,196.9,Found,1986,-84.279230,161.610950
-900003,SIM-Latitud,L5,5,Found,2026,95,1
+1,SIM-Duplicado,L5,5,Found,2026,1,1
