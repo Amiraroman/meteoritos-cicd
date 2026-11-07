@@ -1,0 +1,60 @@
+name: CI/CD meteoritos
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    name: CI — Verificación
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Obtener los archivos del repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Ejecutar pruebas automatizadas
+        run: python -m pytest -v
+
+      - name: Validar el CSV completo
+        run: python scripts/validacion.py datos/meteoritos.csv
+
+      - name: Generar el informe web
+        run: python scripts/generar_sitio.py --csv datos/meteoritos.csv --salida public
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          ESTUDIANTE: ${{ vars.ESTUDIANTE }}
+
+      - name: Preparar artefacto para GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  cd:
+    name: CD — Publicación
+    needs: ci            # solo se ejecuta si CI terminó correctamente
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - name: Desplegar en GitHub Pages
+        id: despliegue
+        uses: actions/deploy-pages@v4
